@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script>
+        var team = `
+        <div class="col-md-12">
+            <div class="input-group input-group-lg p-2 partner">
+                <input type="text" name="team" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                <button class="btn btn-outline-secondary btn-remove" type="button" id="button-addon2">팀제거</button>
+            </div>
+        </div> 
+        `;
+
+        var form = `
+        <form name="partner-form">
+            <div class="row">
+                <div class="col-md-12">
+                        <div class="input-group input-group-md p-2">
+                            <select class="form-select" aria-label="Default select example" id="terms" name="terms">
+                                <option selected>간격</option>
+                                <option value="10">10분</option>
+                                <option value="15">15분</option>
+                                <option value="20">20분</option>
+                                <option value="30">30분</option>
+                            </select>
+                        </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group input-group-lg p-2">
+                        <select class="form-select" id="inputGroupSelect01" name="territory" id="territory">
+                            <option selected>구역명</option>
+                            <option value="회관 앞">회관앞</option>
+                            <option value="메가커피 앞">메가커피 앞</option>
+                            <option value="롯데마트 앞">롯데마트 앞</option>
+                            <option value="투썸플레이스 앞">투썸플레이스 앞</option>
+                            <option value="투썸플레이스 건너편">투썸플레이스 건너편</option>
+                            <option value="계원대학교 입구 앞 공원">계원대학교 입구 앞 공원</option>
+                            <option value="홈플러스 앞">홈플러스 앞</option>
+                            <option value="계원대 후문">계원대 후문</option>
+                            <option value="데시앙플렉스 스터벅스 앞">데시앙플렉스 스터벅스 앞</option>
+                            <option value="맘모스 커피 앞">맘모스 커피 앞</option>
+                            <option value="두림야스카와">두림야스카와</option>
+                            <option value="emart24 앞">emart24 앞</option>
+                          </select>
+                        <button class="btn btn-outline-secondary add-team" type="button" id="button-addon2">팀추가</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-5 team-div">
+                <div class="col-md-12">
+                    <div class="input-group input-group-lg p-2 partner">
+                        <input type="text" name="team" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                        <button class="btn btn-outline-secondary btn-remove" type="button" id="button-addon2">팀제거</button>
+                    </div>
+                </div>  <!-- /div.col-md-12 -->
+            </div>  <!-- /div.row -->
+        </form>  
+        `;
+
+        function createMessage(data){
+            const territories = data.territories;
+            let message = "";
+            for(let i=0;i<territories.length;i++){
+                const territory = territories[i];
+                message += setTitle(territory.territory);
+                const timeLine = getTimeLine(data.startHour, data.endHour, territory.terms);
+                message += setContents(timeLine, territory.teams)
+            }
+            return message;
+        }
+
+        function setContents(timeLines, teams){
+            let result =""
+            for(let i=0;i<timeLines.length;i++){
+                result += setTeamsByTime(timeLines[i], teams[i%teams.length])
+            }
+            return result;
+        }
+
+        function setTitle(title){
+            return title+"\r\n"; 
+        }
+
+        function setTeamsByTime(time, team){
+            return dateToTime(time)+" "+team+"\r\n";
+        }
+
+        function getTimeLine(startHour, endHour, terms){
+            const timeLine = [];
+            const startDate = new Date(2022, 1, 1, startHour, 0);
+            const count = getTimeLineCount(startHour, endHour, terms);
+            for(let i=0;i<count;i++){
+                const copyDate = new Date(startDate);
+                copyDate.setMinutes(terms*(i));
+                timeLine.push(copyDate);
+            }
+            return timeLine;
+        }
+
+        function copy(){
+            const data = {
+                startHour:document.getElementById("startDate").value,
+                endHour:document.getElementById("endDate").value,
+                territories: getTerritories()
+            }
+            const text = createMessage(data);
+            copyToClipboard(text);
+            alert("복사완료");
+        }
+
+        function copyToClipboard(val) {
+            const t = document.createElement("textarea");
+            document.body.appendChild(t);
+            t.value = val;
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+        }
+
+        function dateToTime(date){
+            return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12:false});
+        }
+        
+
+        function getTimeLineCount(startHour, endHour, terms){
+            return Math.round(((endHour*60)-(startHour*60))/terms);
+        }
+
+        function getTerritories(){
+            const territories = new Array();
+            $("form").each(function(index, item){
+                territories.push(
+                    serialToJson($(item).serializeArray())
+                );
+            });            
+            return territories;
+        }
+
+        function serialToJson(serial){
+            var object = {};
+            var team = [];
+            for(let i = 0; i <serial.length; i++){
+                if(serial[i]['name'] == 'team'){
+                    team.push(serial[i]['value']);
+                    continue;
+                }
+                object[serial[i]['name']]=serial[i]['value'];
+            }
+            object["teams"] = team;
+            return object;
+        }
+
+        $(function() {
+            // Remove button click
+            $(document).on(
+                'click',
+                '.btn-remove',
+                function(e) {
+                    e.preventDefault();
+                    $(this).closest('.partner').remove();
+                }
+            );
+            // Add button click
+            $(document).on(
+                'click',
+                '.add-team',
+                function(e) {
+                    e.preventDefault();
+                    $(this).parents('form').children('.team-div').append(team);
+                }
+            );
+            $(document).on(
+                'click',
+                '#add-territory',
+                function(e){
+                    e.preventDefault();
+                    $('#form-container').append(form);
+                }
+            )
+            $(document).on(
+                'click',
+                '#remove-territory',
+                function(e){
+                    e.preventDefault();
+                    $('#form-container').children("form:last-child").remove();
+                }
+            )
+        });
+    </script>
+</head>
+<body>
+    <div class="container px-4">
+        <div class="row p-2">
+            <div class="col-6">
+                <div class="input-group mb-7">
+                    <select class="form-select" id="startDate" name="startDate">
+                        <option selected>시작시간</option>
+                        <option value="10">10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                        <option value="13">13:00</option>
+                        <option value="14">14:00</option>
+                        <option value="15">15:00</option>
+                        <option value="16">16:00</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="input-group mb-3">
+                    <select class="form-select" id="endDate" name="endDate">
+                        <option selected>종료시간</option>
+                        <option value="10">10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                        <option value="13">13:00</option>
+                        <option value="14">14:00</option>
+                        <option value="15">15:00</option>
+                        <option value="16">16:00</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container px-4" id="form-container">
+        <form name="partner-form">
+            <div class="row">
+                <div class="col-md-12">
+                        <div class="input-group input-group-md p-2">
+                            <select class="form-select" aria-label="Default select example" id="terms" name="terms">
+                                <option selected>간격</option>
+                                <option value="10">10분</option>
+                                <option value="15">15분</option>
+                                <option value="20">20분</option>
+                                <option value="30">30분</option>
+                            </select>
+                        </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group input-group-lg p-2">
+                        <select class="form-select" id="inputGroupSelect01" name="territory" id="territory">
+                            <option selected>구역명</option>
+                            <option value="회관 앞">회관앞</option>
+                            <option value="메가커피 앞">메가커피 앞</option>
+                            <option value="롯데마트 앞">롯데마트 앞</option>
+                            <option value="투썸플레이스 앞">투썸플레이스 앞</option>
+                            <option value="투썸플레이스 건너편">투썸플레이스 건너편</option>
+                            <option value="계원대학교 입구 앞 공원">계원대학교 입구 앞 공원</option>
+                            <option value="홈플러스 앞">홈플러스 앞</option>
+                            <option value="계원대 후문">계원대 후문</option>
+                            <option value="데시앙플렉스 스터벅스 앞">데시앙플렉스 스터벅스 앞</option>
+                            <option value="맘모스 커피 앞">맘모스 커피 앞</option>
+                            <option value="두림야스카와">두림야스카와</option>
+                            <option value="emart24 앞">emart24 앞</option>
+                          </select>
+                        <button class="btn btn-outline-secondary add-team" type="button" id="button-addon2">팀추가</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-5 team-div">
+                <div class="col-md-12">
+                    <div class="input-group input-group-lg p-2 partner">
+                        <input type="text" name="team" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                        <button class="btn btn-outline-secondary btn-remove" type="button" id="button-addon2">팀제거</button>
+                    </div>
+                </div>  <!-- /div.col-md-12 -->
+            </div>  <!-- /div.row -->
+        </form>     
+    </div>
+    <div class="container px-4">
+        <div class="row p-2">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" id="add-territory">구역추가</button>
+                <button type="button" class="btn btn-danger" id="remove-territory">구역제거</button>
+                <button type="button" class="btn btn-warning" id="copy" onclick="javascript:copy();">복사하기</button>                
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!------ Include the above in your HEAD tag ---------->
+
