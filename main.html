@@ -73,7 +73,7 @@
                 message += setTitle(territory.territory);
                 const timeLine = getTimeLine(data.startHour, data.endHour, territory.terms);
                 message += setContents(timeLine, territory.teams)
-                if(i!=territories.length){
+                if(i!=(territories.length-1)){
                     message += "\r\n";
                 }
             }
