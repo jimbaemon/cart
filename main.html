@@ -73,6 +73,9 @@
                 message += setTitle(territory.territory);
                 const timeLine = getTimeLine(data.startHour, data.endHour, territory.terms);
                 message += setContents(timeLine, territory.teams)
+                if(i!=territories.length){
+                    message += "\r\n";
+                }
             }
             return message;
         }
@@ -256,7 +259,7 @@
                             <option value="홈플러스 앞">홈플러스 앞</option>
                             <option value="계원대 후문">계원대 후문</option>
                             <option value="데시앙플렉스 스터벅스 앞">데시앙플렉스 스터벅스 앞</option>
-                            <option value="맘모스 커피 앞">맘모스 커피 앞</option>
+                            <option value="메머드 익스프레스 앞">메머드 익스프레스 앞</option>
                             <option value="두림야스카와">두림야스카와</option>
                             <option value="emart24 앞">emart24 앞</option>
                           </select>
