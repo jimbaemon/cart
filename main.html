@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <script>
         var team = `
         <div class="col-md-12">
@@ -25,7 +24,7 @@
                 <div class="col-md-12">
                         <div class="input-group input-group-md p-2">
                             <select class="form-select" aria-label="Default select example" id="terms" name="terms">
-                                <option selected>간격</option>
+                                <option selected value="">간격</option>
                                 <option value="10">10분</option>
                                 <option value="15">15분</option>
                                 <option value="20">20분</option>
@@ -36,7 +35,7 @@
                 <div class="col-md-12">
                     <div class="input-group input-group-lg p-2">
                         <select class="form-select" id="inputGroupSelect01" name="territory" id="territory">
-                            <option selected>구역명</option>
+                            <option selected value="">구역명</option>
                             <option value="회관 앞">회관앞</option>
                             <option value="메가커피 앞">메가커피 앞</option>
                             <option value="롯데마트 앞">롯데마트 앞</option>
@@ -109,14 +108,49 @@
         }
 
         function copy(){
+            try{
+                const data = getData();
+                validate(data);
+                const text = createMessage(data);
+                copyToClipboard(text);
+                saveData(data);
+                alert("복사완료");
+            }catch(e){
+                alert(e);
+            }
+        }
+
+        function validate(data){
+            if(data.startHour == "" || data.startHour == 'undefined'){
+                document.getElementById("startDate").focus();
+                throw "시작시간 정보가 없습니다.";
+            }
+            if(data.endHour == "" || data.endHour == 'undefined'){
+                document.getElementById("endDate").focus();
+                throw "종료시간 정보가 없습니다.";
+            }
+            for(let i = 0 ; i < data.territories.length; i++){
+                let territory = data.territories[i];
+                if(territory.terms == ""){
+                    throw (i+1) + "번째 간격 정보가 없습니다.";
+                }
+                if(territory.territory == ""){
+                    throw (i+1) + "번째 구역 정보가 없습니다.";
+                }
+            }
+        }
+
+        function saveData(data){
+            localStorage.setItem('data', JSON.stringify(data));
+        }
+
+        function getData(){
             const data = {
                 startHour:document.getElementById("startDate").value,
                 endHour:document.getElementById("endDate").value,
                 territories: getTerritories()
             }
-            const text = createMessage(data);
-            copyToClipboard(text);
-            alert("복사완료");
+            return data;            
         }
 
         function copyToClipboard(val) {
@@ -205,7 +239,7 @@
             <div class="col-6">
                 <div class="input-group mb-7">
                     <select class="form-select" id="startDate" name="startDate">
-                        <option selected>시작시간</option>
+                        <option selected value="">시작시간</option>
                         <option value="10">10:00</option>
                         <option value="11">11:00</option>
                         <option value="12">12:00</option>
@@ -219,7 +253,7 @@
             <div class="col-6">
                 <div class="input-group mb-3">
                     <select class="form-select" id="endDate" name="endDate">
-                        <option selected>종료시간</option>
+                        <option selected value="">종료시간</option>
                         <option value="10">10:00</option>
                         <option value="11">11:00</option>
                         <option value="12">12:00</option>
@@ -238,7 +272,7 @@
                 <div class="col-md-12">
                         <div class="input-group input-group-md p-2">
                             <select class="form-select" aria-label="Default select example" id="terms" name="terms">
-                                <option selected>간격</option>
+                                <option selected value="">간격</option>
                                 <option value="10">10분</option>
                                 <option value="15">15분</option>
                                 <option value="20">20분</option>
@@ -249,7 +283,7 @@
                 <div class="col-md-12">
                     <div class="input-group input-group-lg p-2">
                         <select class="form-select" id="inputGroupSelect01" name="territory" id="territory">
-                            <option selected>구역명</option>
+                            <option selected value="">구역명</option>
                             <option value="회관 앞">회관앞</option>
                             <option value="메가커피 앞">메가커피 앞</option>
                             <option value="롯데마트 앞">롯데마트 앞</option>
