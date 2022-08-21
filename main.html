@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -13,6 +14,10 @@
         const territory = ["회관 앞", "메가커피 앞", "롯데마트 앞", "투썸플레이스 앞", "투썸플레이스 건너편", "계원대학교 입구 앞 공원", "홈플러스 앞", "계원대 후문", "데시앙플렉스 스터벅스 앞", "매머드 익스프레스 앞", "두림야스카와", "emart24 앞"];
         
 
+        function init(){
+            loadPage();
+        }
+        
         /**
          * 팀 정보를 생성한다. 
          **/
@@ -141,52 +146,6 @@
             return form;
         }
 
-        // var form = `
-        // <form name="partner-form">
-        //     <div class="row">
-        //         <div class="col-md-12">
-        //                 <div class="input-group input-group-md p-2">
-        //                     <select class="form-select" id="terms" name="terms">
-        //                         <option selected value="">간격</option>
-        //                         <option value="10">10분</option>
-        //                         <option value="15">15분</option>
-        //                         <option value="20">20분</option>
-        //                         <option value="30">30분</option>
-        //                     </select>
-        //                 </div>
-        //         </div>
-        //         <div class="col-md-12">
-        //             <div class="input-group input-group-lg p-2">
-        //                 <select class="form-select" name="territory" id="territory">
-        //                     <option selected value="">구역명</option>
-        //                     <option value="회관 앞">회관앞</option>
-        //                     <option value="메가커피 앞">메가커피 앞</option>
-        //                     <option value="롯데마트 앞">롯데마트 앞</option>
-        //                     <option value="투썸플레이스 앞">투썸플레이스 앞</option>
-        //                     <option value="투썸플레이스 건너편">투썸플레이스 건너편</option>
-        //                     <option value="계원대학교 입구 앞 공원">계원대학교 입구 앞 공원</option>
-        //                     <option value="홈플러스 앞">홈플러스 앞</option>
-        //                     <option value="계원대 후문">계원대 후문</option>
-        //                     <option value="데시앙플렉스 스터벅스 앞">데시앙플렉스 스터벅스 앞</option>
-        //                     <option value="매머드 익스프레스 앞">매머드 익스프레스 앞</option>
-        //                     <option value="두림야스카와">두림야스카와</option>
-        //                     <option value="emart24 앞">emart24 앞</option>
-        //                   </select>
-        //                 <button class="btn btn-outline-secondary add-team" type="button" id="button-addon2">팀추가</button>
-        //             </div>
-        //         </div>
-        //     </div>
-        //     <div class="row gx-5 team-div">
-        //         <div class="col-md-12">
-        //             <div class="input-group input-group-lg p-2 partner">
-        //                 <input type="text" name="team" class="form-control" id="basic-url" aria-describedby="basic-addon3">
-        //                 <button class="btn btn-outline-secondary btn-remove" type="button" id="button-addon2">팀제거</button>
-        //             </div>
-        //         </div>  <!-- /div.col-md-12 -->
-        //     </div>  <!-- /div.row -->
-        // </form>  
-        // `;
-
         /**
          * 데이터로 카카오톡 메시지 생성
         **/
@@ -261,7 +220,7 @@
                 validate(data);
                 const text = createMessage(data);
                 copyToClipboard(text);
-                saveData(data);
+                //saveData(data); //TODO:요청시 복사 버튼에 저장하기 추가
                 alert("복사완료");
             }catch(e){
                 alert(e);
@@ -296,6 +255,7 @@
         **/
         function saveData(data){
             localStorage.setItem('data', JSON.stringify(data));
+            alert("저장이 완료 되었습니다.");
         }
 
         /**
@@ -305,17 +265,48 @@
             return JSON.parse(localStorage.getItem('data'));
         }
 
+        function confirmLoad(){
+            if(confirm("저장된 정보를 불러오시겠습니까? 현재 작성된 정보는 사라집니다.")){
+                loadPage();
+            }
+        }
+
         /**
          * 저장된 데이터를 페이지에 로드 합니다.
         **/
         function loadPage(){
             let data = loadData();
             if(!data){
+                reset();
                 return;
             }
-            document.querySelector("#startDate option[value="+CSS.escape(data.startHour)+"]").selected = true;
-            document.querySelector("#startDate option[value="+CSS.escape(data.endHour)+"]").selected = true;
+            document.querySelector("#startDate option[value='"+CSS.escape(data.startHour)+"']").selected = true;
+            document.querySelector("#endDate option[value='"+CSS.escape(data.endHour)+"']").selected = true;
+            let bodyForm = document.querySelector("#form-container");
+            bodyForm.innerHTML = "";
+            if(!data.territories){
+                bodyForm.append(getBodyForm());
+            }else{
+                data.territories.forEach((value) => {
+                    bodyForm.append(getBodyForm(value.terms, value.territory, value.teams));
+                });
+            }
         }
+
+        /**
+         * 초기화 하기
+         **/
+        function reset(){
+            if(confirm("초기화하시겠습니까? 저장된 정보는 사라지지 않습니다.")){
+                document.querySelector("#startDate option[value='']").selected = true;
+                document.querySelector("#endDate option[value='']").selected = true;
+                let bodyForm = document.querySelector("#form-container");
+                bodyForm.innerHTML = "";
+                bodyForm.append(getBodyForm());
+            }
+        }
+
+
 
         /**
          * Form 에서 처리하기 쉬운 Data 형태로 가공
@@ -413,6 +404,7 @@
                     $('#form-container').children("form:last-child").remove();
                 }
             )
+            init();
         });
     </script>
 </head>
@@ -496,10 +488,25 @@
     </div>
     <div class="container px-4">
         <div class="row p-2">
-            <div class="col-md-12">
-                <button type="button" class="btn btn-primary" id="add-territory">구역추가</button>
-                <button type="button" class="btn btn-danger" id="remove-territory">구역제거</button>
-                <button type="button" class="btn btn-warning" id="copy" onclick="javascript:copy();">복사하기</button>                
+            <div class="col-md-6">
+                <button type="button" class="btn btn-success" id="add-territory">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" class="btn btn-danger" id="remove-territory">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-warning" id="copy" onclick="javascript:copy();">복사하기</button>
+            </div>
+            <div class="col-md-6 text-end">
+                <button type="button" class="btn btn-primary" onclick="javascript:saveData(getData());">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </button>
+                <button type="button" class="btn btn-primary" id="copy" onclick="javascript:confirmLoad();">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </button>
+                <button type="button" class="btn btn-danger" id="copy" onclick="javascript:reset();">
+                    <i class="fa-solid fa-arrow-rotate-right"></i>
+                </button>                
             </div>
         </div>
     </div>
