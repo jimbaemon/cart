@@ -490,28 +490,31 @@
     </div>
     <div class="container px-4">
         <div class="row p-2">
-            <div class="col-md-6">
+            <div class="col">
                 <button type="button" class="btn btn-success" id="add-territory">
                     <i class="fa-solid fa-plus"></i>
                 </button>
                 <button type="button" class="btn btn-danger" id="remove-territory">
                     <i class="fa-solid fa-minus"></i>
                 </button>
-                <button type="button" class="btn btn-warning" id="copy" onclick="javascript:copy();">복사하기</button>
+                <button type="button" class="btn btn-warning" id="copy" onclick="javascript:copy();">
+                    복사
+                </button>
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col text-end">
                 <button type="button" class="btn btn-primary" onclick="javascript:saveData(getData());">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                 </button>
                 <button type="button" class="btn btn-primary" id="copy" onclick="javascript:confirmLoad();">
                     <i class="fa-solid fa-cloud-arrow-down"></i>
                 </button>
-                <button type="button" class="btn btn-danger" id="copy" onclick="javascript:confirmReset();">
+                <button type="button" class="btn btn-danger" id="copy" onclick="javascript:reset();">
                     <i class="fa-solid fa-arrow-rotate-right"></i>
                 </button>                
             </div>
         </div>
     </div>
+   
 </body>
 </html>
 <!------ Include the above in your HEAD tag ---------->
