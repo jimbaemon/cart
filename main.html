@@ -125,6 +125,7 @@
         function getBodyForm(termValue, territoryValue, teamValueList){
             let form = document.createElement("form");
             form.setAttribute("name", "partner-form");
+            form.onsubmit = function(){return false;};
             
             let firstRow = document.createElement("div");
             firstRow.setAttribute("class", "row");
@@ -444,7 +445,7 @@
         </div>
     </div>
     <div class="container px-4" id="form-container">
-        <form name="partner-form">
+        <form name="partner-form" onsubmit="return false;">
             <div class="row">
                 <div class="col-md-12">
                         <div class="input-group input-group-md p-2">
