@@ -293,20 +293,22 @@
             }
         }
 
+        function confirmReset(){
+            if(confirm("초기화하시겠습니까? 저장된 정보는 사라지지 않습니다.")){
+                reset();
+            }
+        }
+
         /**
          * 초기화 하기
          **/
         function reset(){
-            if(confirm("초기화하시겠습니까? 저장된 정보는 사라지지 않습니다.")){
-                document.querySelector("#startDate option[value='']").selected = true;
-                document.querySelector("#endDate option[value='']").selected = true;
-                let bodyForm = document.querySelector("#form-container");
-                bodyForm.innerHTML = "";
-                bodyForm.append(getBodyForm());
-            }
+            document.querySelector("#startDate option[value='']").selected = true;
+            document.querySelector("#endDate option[value='']").selected = true;
+            let bodyForm = document.querySelector("#form-container");
+            bodyForm.innerHTML = "";
+            bodyForm.append(getBodyForm());
         }
-
-
 
         /**
          * Form 에서 처리하기 쉬운 Data 형태로 가공
@@ -504,7 +506,7 @@
                 <button type="button" class="btn btn-primary" id="copy" onclick="javascript:confirmLoad();">
                     <i class="fa-solid fa-cloud-arrow-down"></i>
                 </button>
-                <button type="button" class="btn btn-danger" id="copy" onclick="javascript:reset();">
+                <button type="button" class="btn btn-danger" id="copy" onclick="javascript:confirmReset();">
                     <i class="fa-solid fa-arrow-rotate-right"></i>
                 </button>                
             </div>
